@@ -30,15 +30,15 @@ router.post("/", async (req, res) => {
     const transporter = nodemailer.createTransport({
       service: "gmail",
       auth: {
-        user: "gowthamkishore6055@gmail.com",
-        pass: "vxwk lxgx vhmc geiq", // Use App Password if 2FA is enabled
+        user: process.env.GMAIL_USER, // Your Gmail address
+        pass: process.env.GMAIL_PASS, // Your Gmail App Password
       },
     });
 
     // Email options
     const mailOptions = {
-      from: "gowthamkishore6055@gmail.com",
-      to: "gowthamkishore6055@gmail.com",
+      from: process.env.GMAIL_USER,
+      to: process.env.GMAIL_USER,
       subject: "New Booking Received",
       html: `
         <h2>New Booking Received</h2>
