@@ -13,7 +13,6 @@ router.post("/", async (req, res) => {
       returnDateAndTime,
       carType,
     } = req.body;
-    console.log(req.body);
     const user = new User({
       name,
       mobile,
