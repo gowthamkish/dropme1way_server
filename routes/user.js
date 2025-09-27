@@ -1,6 +1,7 @@
 const express = require("express");
 const User = require("../models/User");
 const router = express.Router();
+const nodemailer = require("nodemailer");
 
 router.post("/", async (req, res) => {
   try {
@@ -24,6 +25,54 @@ router.post("/", async (req, res) => {
       tripType: "oneway",
     });
     await user.save();
+
+    // Create transporter
+    const transporter = nodemailer.createTransport({
+      service: "gmail",
+      auth: {
+        user: "gowthamkishore6055@gmail.com",
+        pass: "vxwk lxgx vhmc geiq", // Use App Password if 2FA is enabled
+      },
+    });
+
+    // Email options
+    const mailOptions = {
+      from: "gowthamkishore6055@gmail.com",
+      to: "gowthamkishore6055@gmail.com",
+      subject: "New Booking Received",
+      html: `
+        <h2>New Booking Received</h2>
+        <p><strong>Name:</strong> ${user.name}</p>
+        <p><strong>Mobile:</strong> ${user.mobile}</p>
+        <p><strong>Pick Up Location:</strong> ${user.pickUpLocation}</p>
+        <p><strong>Drop Off Location:</strong> ${user.dropOffLocation}</p>
+        <p><strong>Pick Up Date & Time:</strong> ${
+          user.pickUpDateAndTime
+            ? new Date(user.pickUpDateAndTime).toLocaleString()
+            : ""
+        }</p>
+        <p><strong>Return Date & Time:</strong> ${
+          user.returnDateAndTime
+            ? new Date(user.returnDateAndTime).toLocaleString()
+            : ""
+        }</p>
+        <p><strong>Car Type:</strong> ${user.carType}</p>
+        <p><strong>Trip Type:</strong> ${user.tripType}</p>
+        <p><strong>Booking Time:</strong> ${
+          user.createdAt ? new Date(user.createdAt).toLocaleString() : ""
+        }</p>
+      `,
+    };
+
+    // Send email
+    transporter.sendMail(mailOptions, (err, info) => {
+      if (err) {
+        console.error("Error sending email:", err);
+      } else {
+        console.log("Email sent:", info.response);
+      }
+    });
+
     res.json({ success: true, user });
   } catch (error) {
     res.status(500).json({ success: false, error: error.message });
