@@ -8,12 +8,15 @@ require("dotenv").config();
 // const { protect, isAdmin } = require("./middlewares/authMiddleware");
 
 const app = express();
-app.use(cors());
+// app.use(cors());
 
-// app.use(cors({
-//   origin: 'https://dropme1way.com',
-//   methods: ['POST'],
-// }));
+// ✅ CORS Setup — allow your frontend domain
+app.use(cors({
+  origin: 'https://dropme1way.com',  // 👈 allow only your custom domain
+  methods: ['GET', 'POST', 'OPTIONS'],
+  credentials: true
+}));
+
 
 app.use(express.json());
 
