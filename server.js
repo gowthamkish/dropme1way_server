@@ -9,6 +9,12 @@ require("dotenv").config();
 
 const app = express();
 app.use(cors());
+
+// app.use(cors({
+//   origin: 'https://dropme1way.com',
+//   methods: ['POST'],
+// }));
+
 app.use(express.json());
 
 // app.get("/", (req, res) => {
