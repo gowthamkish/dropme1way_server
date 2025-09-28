@@ -30,7 +30,7 @@ router.post("/", async (req, res) => {
 
     const { data, error } = await resendKey.emails.send({
       from: "DropMe1Way <booking@dropme1way.com>",
-      to: [process.env.GMAIL_USER],
+      to: [process.env.GMAIL_USER, "kgstechwayservices@gmail.com"],
       subject: "New Booking Received",
       html: `
         <h2>New Booking Received</h2>
