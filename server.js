@@ -2,27 +2,19 @@ const express = require("express");
 const mongoose = require("mongoose");
 const cors = require("cors");
 require("dotenv").config();
-// const authRoutes = require("./routes/auth");
-// const productRoutes = require("./routes/products");
-// const adminRoutes = require("./routes/admin");
-// const { protect, isAdmin } = require("./middlewares/authMiddleware");
 
 const app = express();
 // app.use(cors());
 
 // ✅ CORS Setup — allow your frontend domain
 app.use(cors({
-  origin: 'https://dropme1way.com',  // 👈 allow only your custom domain
+  origin: ['https://dropme1way.com', 'http://localhost:5173'],  // 👈 allow only your custom domain
   methods: ['GET', 'POST', 'OPTIONS'],
   credentials: true
 }));
 
 
 app.use(express.json());
-
-// app.get("/", (req, res) => {
-//   res.status(200).json("Welcome, your app is working well");
-// });
 
 
 // Global Mongoose connection handler for Vercel/serverless
@@ -43,9 +35,6 @@ const connectToDatabase = async () => {
 
 connectToDatabase();
 
-// app.use("/api/auth", authRoutes);
-// app.use("/api/products", protect, productRoutes);
-// app.use("/api/admin", protect, isAdmin, adminRoutes);
 app.use("/api/bookings", require("./routes/user"));
 
 
