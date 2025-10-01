@@ -1,9 +1,7 @@
 const express = require("express");
 const User = require("../models/User");
 const router = express.Router();
-const nodemailer = require("nodemailer");
 const { Resend } = require("resend");
-const { default: axios } = require("axios");
 const resendKey = new Resend(process.env.RESEND_API_KEY);
 
 router.post("/", async (req, res) => {

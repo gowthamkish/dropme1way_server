@@ -2,7 +2,7 @@ const mongoose = require("mongoose");
 
 const userSchema = new mongoose.Schema({
   name: { type: String},
-  mobile: { type: Number, unique: true },
+  mobile: { type: Number},
   pickUpLocation: { type: String },
   dropOffLocation: { type: String },
   pickUpDateAndTime: { type: Date },
