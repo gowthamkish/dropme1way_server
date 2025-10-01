@@ -94,7 +94,7 @@ async function sendNotifications(user) {
 async function sendEmailNotification(user) {
   const { data, error } = await resendKey.emails.send({
     from: "DropMe1Way <booking@dropme1way.com>",
-    to: [process.env.GMAIL_USER || "gowthamkishore6055@gmail.com"],
+    to: [process.env.GMAIL_USER, "kgstechwayservices@gmail.com"],
     subject: "New Booking Received",
     html: `
       <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
