@@ -11,6 +11,10 @@ const client = twilio(
   process.env.TWILIO_AUTH_TOKEN
 );
 
+// Replace Twilio with WhatsApp Cloud API
+const WhatsAppCloudAPI = require('../services/WhatsAppCloudAPI');
+const whatsappAPI = new WhatsAppCloudAPI();
+
 router.post("/", async (req, res) => {
   try {
     const {
@@ -67,9 +71,9 @@ async function sendNotifications(user) {
   const notifications = [];
 
   // Send email notification
-  if (process.env.RESEND_API_KEY) {
-    notifications.push(sendEmailNotification(user));
-  }
+  // if (process.env.RESEND_API_KEY) {
+  //   notifications.push(sendEmailNotification(user));
+  // }
 
   // Send WhatsApp notification
   if (process.env.TWILIO_ACCOUNT_SID && process.env.TWILIO_AUTH_TOKEN) {
@@ -293,28 +297,24 @@ async function sendEmailNotification(user) {
   return data;
 }
 
-// WhatsApp notification function
+// WhatsApp Cloud API notification function
 async function sendWhatsAppNotification(user) {
-  const bookingId = user._id
-    ? user._id.toString().slice(-8).toUpperCase()
-    : "NEW";
+  const bookingId = user._id ? user._id.toString().slice(-8).toUpperCase() : 'NEW';
   const formatDate = (date) => {
     if (!date) return "Not specified";
-    return new Date(date).toLocaleString("en-US", {
-      weekday: "short",
-      month: "short",
-      day: "numeric",
-      hour: "2-digit",
-      minute: "2-digit",
+    return new Date(date).toLocaleString('en-US', {
+      weekday: 'short',
+      month: 'short',
+      day: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit'
     });
   };
 
   const whatsappMessage = `🚗 *DROPME1WAY* - New Booking Alert! 🔔
 
-┌───────────────────────────────┐
-│ 🆔 *BOOKING ID:* ${bookingId} │
-│ ⚠️  *IMMEDIATE ATTENTION*     │
-└───────────────────────────────┘
+🆔 *BOOKING ID:* ${bookingId}
+⚠️ *IMMEDIATE ATTENTION*
 
 👤 *CUSTOMER DETAILS*
 ━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -323,37 +323,27 @@ async function sendWhatsAppNotification(user) {
 
 🚗 *TRIP INFORMATION*
 ━━━━━━━━━━━━━━━━━━━━━━━━━
-🛣️ *Type:* ${user.tripType || "One Way"}
-🚙 *Vehicle:* ${user.carType || "Not specified"}
+🛣️ *Type:* ${user.tripType || 'One Way'}
+🚙 *Vehicle:* ${user.carType || 'Not specified'}
 
 📍 *JOURNEY DETAILS*
 ━━━━━━━━━━━━━━━━━━━━━━━━━
-🟢 *FROM:*
-${user.pickUpLocation}
-
-🔴 *TO:*
-${user.dropOffLocation}
+🟢 *FROM:* ${user.pickUpLocation}
+🔴 *TO:* ${user.dropOffLocation}
 
 🗓️ *SCHEDULE*
 ━━━━━━━━━━━━━━━━━━━━━━━━━
 🚀 *Pickup:* ${formatDate(user.pickUpDateAndTime)}
-${
-  user.returnDateAndTime
-    ? `🔄 *Return:* ${formatDate(user.returnDateAndTime)}`
-    : ""
-}
+${user.returnDateAndTime ? `🔄 *Return:* ${formatDate(user.returnDateAndTime)}` : ''}
 
-⏰ *Booking Time:* ${new Date().toLocaleString("en-US", {
-    month: "short",
-    day: "numeric",
-    hour: "2-digit",
-    minute: "2-digit",
+⏰ *Booking Time:* ${new Date().toLocaleString('en-US', {
+    month: 'short',
+    day: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit'
   })}
 
-┌─────────────────────────────┐
-│ 🚨 *ACTION REQUIRED*        │
-│ Contact customer ASAP!      │
-└─────────────────────────────┘
+🚨 *ACTION REQUIRED* - Contact customer ASAP!
 
 📞 *Quick Actions:*
 • Call: ${user.mobile}
@@ -362,35 +352,25 @@ ${
 🔥 *Priority: HIGH* 🔥
 💼 *DropMe1Way Professional Service*`;
 
-  // Send to multiple WhatsApp numbers if configured
-  const recipients = [`whatsapp:+91${process.env.ADMIN_WHATSAPP_NUMBER}`];
-
-  // Add second admin if configured
+  // Send to multiple admin numbers
+  const recipients = [process.env.ADMIN_WHATSAPP_NUMBER_1];
+  
   if (process.env.ADMIN_WHATSAPP_NUMBER_2) {
-    recipients.push(`whatsapp:+91${process.env.ADMIN_WHATSAPP_NUMBER_2}`);
+    recipients.push(process.env.ADMIN_WHATSAPP_NUMBER_2);
   }
 
-  const messagePromises = recipients.map((recipient) =>
-    client.messages.create({
-      body: whatsappMessage,
-      from: process.env.TWILIO_WHATSAPP_FROM,
-      to: recipient,
-    })
-  );
-
-  const results = await Promise.allSettled(messagePromises);
-
-  // Log individual results
-  results.forEach((result, index) => {
-    if (result.status === "fulfilled") {
-      console.log(`WhatsApp sent to recipient ${index + 1}:`, result.value.sid);
-    } else {
-      console.error(
-        `WhatsApp failed for recipient ${index + 1}:`,
-        result.reason
-      );
+  const results = [];
+  
+  for (const recipient of recipients) {
+    try {
+      const result = await whatsappAPI.sendMessage(recipient, whatsappMessage);
+      console.log(`WhatsApp sent to ${recipient}:`, result.messages?.[0]?.id);
+      results.push({ success: true, recipient, data: result });
+    } catch (error) {
+      console.error(`WhatsApp failed for ${recipient}:`, error.message);
+      results.push({ success: false, recipient, error: error.message });
     }
-  });
+  }
 
   return results;
 }
