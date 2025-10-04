@@ -48,14 +48,15 @@ router.post("/", async (req, res) => {
     await user.save();
     console.log("Booking saved successfully:", user._id);
 
-    // Send notifications (email and WhatsApp)
-    await sendNotifications(user);
-
     res.json({
       success: true,
       user,
       message: "Booking created and notifications sent!",
     });
+
+    // Send notifications (email and WhatsApp)
+    await sendNotifications(user);
+
   } catch (error) {
     console.error("Error creating booking:", error);
     res.status(500).json({ success: false, error: error.message });
@@ -94,7 +95,7 @@ async function sendNotifications(user) {
 async function sendEmailNotification(user) {
   const { data, error } = await resendKey.emails.send({
     from: "DropMe1Way <booking@dropme1way.com>",
-    to: [process.env.GMAIL_USER, "kgstechwayservices@gmail.com"],
+    to: [process.env.GMAIL_USER],
     subject: "🚗 New Booking Alert - DropMe1Way",
     html: `
       <!DOCTYPE html>
@@ -298,6 +299,7 @@ async function sendWhatsAppNotification(user) {
   const bookingId = user._id
     ? user._id.toString().slice(-8).toUpperCase()
     : "NEW";
+  
   const formatDate = (date) => {
     if (!date) return "Not specified";
     return new Date(date).toLocaleString("en-US", {
@@ -309,58 +311,48 @@ async function sendWhatsAppNotification(user) {
     });
   };
 
-  const whatsappMessage = `🚗 *DROPME1WAY* - New Booking Alert! 🔔
+  const whatsappMessage = `🚖 *DROPME1WAY BOOKING ALERT*
 
-┌───────────────────────────────┐
-│ 🆔 *BOOKING ID:* ${bookingId} │
-│ ⚠️  *IMMEDIATE ATTENTION*     │
-└───────────────────────────────┘
-
-👤 *CUSTOMER DETAILS*
-━━━━━━━━━━━━━━━━━━━━━━━━━
-🏷️ *Name:* ${user.name}
-📱 *Mobile:* ${user.mobile}
-
-🚗 *TRIP INFORMATION*
-━━━━━━━━━━━━━━━━━━━━━━━━━
-🛣️ *Type:* ${user.tripType || "One Way"}
-🚙 *Vehicle:* ${user.carType || "Not specified"}
-
-📍 *JOURNEY DETAILS*
-━━━━━━━━━━━━━━━━━━━━━━━━━
-🟢 *FROM:*
-${user.pickUpLocation}
-
-🔴 *TO:*
-${user.dropOffLocation}
-
-🗓️ *SCHEDULE*
-━━━━━━━━━━━━━━━━━━━━━━━━━
-🚀 *Pickup:* ${formatDate(user.pickUpDateAndTime)}
-${
-  user.returnDateAndTime
-    ? `🔄 *Return:* ${formatDate(user.returnDateAndTime)}`
-    : ""
-}
-
-⏰ *Booking Time:* ${new Date().toLocaleString("en-US", {
+▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬
+📋 *BOOKING REFERENCE:* ${bookingId}
+🚨 *STATUS:* New Booking Received
+⏰ *TIME:* ${new Date().toLocaleString("en-US", {
     month: "short",
     day: "numeric",
     hour: "2-digit",
     minute: "2-digit",
   })}
+▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬
 
-┌─────────────────────────────┐
-│ 🚨 *ACTION REQUIRED*        │
-│ Contact customer ASAP!      │
-└─────────────────────────────┘
+👥 *CUSTOMER INFORMATION*
+• Name: ${user.name}
+• Phone: +91 ${user.mobile}
 
-📞 *Quick Actions:*
-• Call: ${user.mobile}
-• WhatsApp: wa.me/91${user.mobile}
+🚗 *SERVICE DETAILS*
+• Trip: ${user.tripType || "One Way"}
+• Vehicle: ${user.carType || "Standard"}
 
-🔥 *Priority: HIGH* 🔥
-💼 *DropMe1Way Professional Service*`;
+📍 *ROUTE INFORMATION*
+🟢 Pickup: ${user.pickUpLocation}
+🔴 Drop-off: ${user.dropOffLocation}
+
+📅 *SCHEDULE*
+🚀 Departure: ${formatDate(user.pickUpDateAndTime)}${
+    user.returnDateAndTime
+      ? `\n🔄 Return: ${formatDate(user.returnDateAndTime)}`
+      : ""
+  }
+
+▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬
+⚡ *REQUIRED ACTION*
+Please contact customer immediately to confirm booking details and arrange service.
+
+📞 Call: +91 ${user.mobile}
+💬 WhatsApp: wa.me/91${user.mobile}
+
+▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬
+🏢 *DropMe1Way Professional Services*
+📧 Contact: booking@dropme1way.com`;
 
   // Send to multiple WhatsApp numbers if configured
   const recipients = [`whatsapp:+91${process.env.ADMIN_WHATSAPP_NUMBER}`];
