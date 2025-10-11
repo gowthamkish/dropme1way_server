@@ -117,7 +117,7 @@ async function sendEmailNotification(user) {
           .info-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin: 20px 0; }
           .info-item { background: #ffffff; padding: 15px; border-radius: 8px; border: 1px solid #e2e8f0; }
           .info-label { font-weight: 600; color: #4a5568; font-size: 12px; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 5px; }
-          .info-value { color: #2d3748; font-size: 16px; font-weight: 500; }
+          .info-value { color: #2d3748; font-size: 16px; font-weight: 500; text-transform: capitalize; }
           .location-section { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-radius: 10px; padding: 20px; margin: 20px 0; color: white; }
           .location-item { display: flex; align-items: center; margin: 10px 0; }
           .location-icon { width: 20px; height: 20px; margin-right: 12px; }
