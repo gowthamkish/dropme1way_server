@@ -73,9 +73,9 @@ async function sendNotifications(user) {
   }
 
   // Send WhatsApp notification
-  if (process.env.TWILIO_ACCOUNT_SID && process.env.TWILIO_AUTH_TOKEN) {
-    notifications.push(sendWhatsAppNotification(user));
-  }
+  // if (process.env.TWILIO_ACCOUNT_SID && process.env.TWILIO_AUTH_TOKEN) {
+  //   notifications.push(sendWhatsAppNotification(user));
+  // }
 
   // Execute all notifications concurrently
   const results = await Promise.allSettled(notifications);
@@ -206,7 +206,7 @@ async function sendEmailNotification(user) {
                   <div class="info-value">${
                     user.pickUpDateAndTime
                       ? new Date(user.pickUpDateAndTime).toLocaleString(
-                          "en-US",
+                          "en-IN",
                           {
                             weekday: "long",
                             year: "numeric",
@@ -214,6 +214,7 @@ async function sendEmailNotification(user) {
                             day: "numeric",
                             hour: "2-digit",
                             minute: "2-digit",
+                            timeZone: "Asia/Kolkata"
                           }
                         )
                       : "Not specified"
@@ -224,7 +225,7 @@ async function sendEmailNotification(user) {
                   <div class="info-value">${
                     user.returnDateAndTime
                       ? new Date(user.returnDateAndTime).toLocaleString(
-                          "en-US",
+                          "en-IN",
                           {
                             weekday: "long",
                             year: "numeric",
@@ -232,6 +233,7 @@ async function sendEmailNotification(user) {
                             day: "numeric",
                             hour: "2-digit",
                             minute: "2-digit",
+                            timeZone: "Asia/Kolkata"
                           }
                         )
                       : "Not specified"
@@ -242,7 +244,7 @@ async function sendEmailNotification(user) {
               <div style="background: #fff3cd; border: 1px solid #ffeaa7; border-radius: 8px; padding: 15px; margin: 20px 0;">
                 <div class="info-label">⏰ Booking Received At</div>
                 <div class="info-value" style="color: #856404;">${new Date().toLocaleString(
-                  "en-US",
+                  "en-IN",
                   {
                     weekday: "long",
                     year: "numeric",
@@ -250,7 +252,7 @@ async function sendEmailNotification(user) {
                     day: "numeric",
                     hour: "2-digit",
                     minute: "2-digit",
-                    second: "2-digit",
+                    timeZone: "Asia/Kolkata"
                   }
                 )}</div>
               </div>
@@ -299,7 +301,7 @@ async function sendWhatsAppNotification(user) {
   const bookingId = user._id
     ? user._id.toString().slice(-8).toUpperCase()
     : "NEW";
-  
+
   const formatDate = (date) => {
     if (!date) return "Not specified";
     return new Date(date).toLocaleString("en-US", {
