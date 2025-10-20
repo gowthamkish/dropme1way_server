@@ -95,7 +95,7 @@ async function sendNotifications(user) {
 async function sendEmailNotification(user) {
   const { data, error } = await resendKey.emails.send({
     from: "DropMe1Way <booking@dropme1way.com>",
-    to: [process.env.GMAIL_USER, "kgstechwayservices@gmail.com", "dropme1waytaxi@gmail.com"],
+    to: ["kgstechwayservices@gmail.com", "dropme1waytaxi@gmail.com"],
     subject: "🚗 New Booking Alert - DropMe1Way",
     html: `
       <!DOCTYPE html>
